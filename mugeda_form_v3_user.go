@@ -64,7 +64,7 @@ func (uw *MugedaFormV3User) Get(c *gin.Context) {
 	uw.OpenID = openid
 	uw.AppID = appid
 	var u model.MugedaFormV3User
-	b, err := u.First(appid, openid)
+	b, err := u.First(openid)
 	if b || err != nil {
 		rwErr("没有查询到信息", err, c)
 		c.Abort()
@@ -91,7 +91,7 @@ func (uw *MugedaFormV3User) CallBack(c *gin.Context) {
 	in.AppID = wx.Context.AppID
 	in.UnionID = userInfo.Unionid
 	in.OpenID = userInfo.OpenID
-	b, err := in.First(in.AppID, in.OpenID)
+	b, err := in.First(in.OpenID)
 	if b { // 写入数据库
 		in.NickName = base64.StdEncoding.EncodeToString([]byte(userInfo.Nickname))
 		in.HeadImg = userInfo.HeadImgURL
@@ -119,8 +119,8 @@ func (uw *MugedaFormV3User) CallBack(c *gin.Context) {
 	c.Redirect(302, c.Request.FormValue("state")+"?oauth=wechat&&code="+code)
 }
 
-// Updates ...
-func (uw *MugedaFormV3User) Updates(c *gin.Context) {
+// UpdateInfo ...
+func (uw *MugedaFormV3User) UpdateInfo(c *gin.Context) {
 	var in model.MugedaFormV3User
 	in.AppID = uw.AppID
 	in.UnionID = uw.UnionID
@@ -141,8 +141,8 @@ func (uw *MugedaFormV3User) Updates(c *gin.Context) {
 func (uw *MugedaFormV3User) OauthURL(c *gin.Context) {
 	wx := uw.GetWeChat()
 	oauth := wx.GetOauth()
-	var redirectURI, scope, state = "https://www.inch.online/v2/mugeda/form/v2/oauth/wechat/callback", "snsapi_userinfo", c.Request.FormValue("state")
-	// var redirectURI, scope, state = "https://t.iuu.pub/v2/api/oauth/wechat/callback", "snsapi_userinfo", c.Request.FormValue("state")
+	var redirectURI, scope, state = "https://www.inch.online/v3/mugeda/form/v3/oauth/wechat/callback", "snsapi_userinfo", c.Request.FormValue("state")
+	// var redirectURI, scope, state = "https://t.iuu.pub/v3/api/oauth/wechat/callback", "snsapi_userinfo", c.Request.FormValue("state")
 	uri, err := oauth.GetRedirectURL(redirectURI, scope, state)
 	if err != nil {
 		rwErr("获取授权地址错误", err, c)

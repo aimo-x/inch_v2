@@ -20,6 +20,8 @@ func New() {
 
 	web(en.Group("v2"))
 	api(en.Group("v2/api"))
+	web3(en.Group("v3"))
+	api3(en.Group("v3/api"))
 
 	if GetConf().IsSsl {
 		go RunTLS(en)
