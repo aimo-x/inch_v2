@@ -1,0 +1,19 @@
+{
+  "host":"https://t.iuu.pub",
+  "port":"80",
+  "is_ssl":true,
+  "ssl_key":"./ssl/3209803_t.iuu.pub.key",
+  "ssl_pem":"./ssl/3209803_t.iuu.pub.pem",
+  "token":"nbc38nsx",
+  "mysql":{
+    "host":"118.89.153.31",
+    "port":"3380",
+    "name":"inch_v2",
+    "user":"root",
+    "password":"039213"
+  },
+  "wechat":{
+    "app_id":"wxbdb9cd64895da3d3",
+    "app_secret":"25295943ffeaa1e9e8b7de4c8588eaf0"
+  }
+}
