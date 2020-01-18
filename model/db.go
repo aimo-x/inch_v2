@@ -45,6 +45,6 @@ func AutoMigrate() error {
 	if err != nil {
 		return err
 	}
-	err = db.AutoMigrate(&UserWechat{}, &MugedaFormV1{}, &MugedaFormV2User{}, &MugedaFormV2{}, &MugedaFormV3User{}, &MugedaFormV3{}).Error
+	err = db.AutoMigrate(&UserWechat{}, &MugedaFormV1{}, &MugedaFormV2User{}, &MugedaFormV2{}, &MugedaFormV3User{}, &MugedaFormV3{}, &MugedaFormV3Bless{}, &MugedaFormV3BlessReceive{}, &MugedaFormV3Camp{}).Error
 	return err
 }

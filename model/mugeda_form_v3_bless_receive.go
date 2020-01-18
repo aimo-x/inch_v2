@@ -29,13 +29,13 @@ func (fbr *MugedaFormV3BlessReceive) Create() error {
 }
 
 // First 查找我的祝福
-func (fbr *MugedaFormV3BlessReceive) First(openid interface{}) (b bool, err error) {
+func (fbr *MugedaFormV3BlessReceive) First(openid interface{}, blessID uint) (b bool, err error) {
 	db, err := db()
 	defer db.Close()
 	if err != nil {
 		return
 	}
-	rows := db.Where("open_id = ?", openid).First(&fbr)
+	rows := db.Where("open_id = ? AND bless_id = ?", openid, blessID).First(&fbr)
 	if b = rows.RecordNotFound(); b {
 		return
 	}
@@ -46,13 +46,13 @@ func (fbr *MugedaFormV3BlessReceive) First(openid interface{}) (b bool, err erro
 }
 
 // AddInvite 增加被邀请者
-func (fbr *MugedaFormV3BlessReceive) AddInvite(openid interface{}, invite string) (b bool, err error) {
+func (fbr *MugedaFormV3BlessReceive) AddInvite(blessReceiveIDInt uint, invite string) (b bool, err error) {
 	db, err := db()
 	defer db.Close()
 	if err != nil {
 		return
 	}
-	rows := db.Where("open_id = ?", openid).First(&fbr)
+	rows := db.Where("id = ?", blessReceiveIDInt).First(&fbr)
 	if b = rows.RecordNotFound(); b {
 		return
 	}
@@ -67,7 +67,7 @@ func (fbr *MugedaFormV3BlessReceive) AddInvite(openid interface{}, invite string
 	}
 	// 最大4个助力
 	if len(ins) > 3 {
-		// err = errors.New("已是最高助力值")
+		// err = errors.New("目标已完成助力")
 		return
 	}
 	if len(fbr.Invite) > 0 {

@@ -10,7 +10,7 @@ import (
 type MugedaFormV3Camp struct {
 	gorm.Model
 	Name  string `json:"name"`  // 阵营名字
-	Score int    `json:"score"` // 等分
+	Score int    `json:"score"` // 得分
 }
 
 // Create 创建阵营

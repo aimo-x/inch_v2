@@ -26,13 +26,30 @@ func (fb *MugedaFormV3Bless) Create() error {
 }
 
 // First 查询祝福
-func (fb *MugedaFormV3Bless) First(openid interface{}) (b bool, err error) {
+func (fb *MugedaFormV3Bless) First(id uint) (b bool, err error) {
 	db, err := db()
 	defer db.Close()
 	if err != nil {
 		return
 	}
-	rows := db.Where("open_id = ?", openid).First(&fb)
+	rows := db.Where("id = ?", id).First(&fb)
+	if b = rows.RecordNotFound(); b {
+		return
+	}
+	if err = rows.Error; err != nil {
+		return
+	}
+	return
+}
+
+// FirstID 查询祝福
+func (fb *MugedaFormV3Bless) FirstID(id interface{}) (b bool, err error) {
+	db, err := db()
+	defer db.Close()
+	if err != nil {
+		return
+	}
+	rows := db.Where("id = ?", id).First(&fb)
 	if b = rows.RecordNotFound(); b {
 		return
 	}

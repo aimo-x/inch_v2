@@ -119,8 +119,8 @@ func (uw *MugedaFormV3User) CallBack(c *gin.Context) {
 	c.Redirect(302, c.Request.FormValue("state")+"?oauth=wechat&&code="+code)
 }
 
-// UpdateInfo ...
-func (uw *MugedaFormV3User) UpdateInfo(c *gin.Context) {
+// PUTUserInfo name + phone + address
+func (uw *MugedaFormV3User) PUTUserInfo(c *gin.Context) {
 	var in model.MugedaFormV3User
 	in.AppID = uw.AppID
 	in.UnionID = uw.UnionID

@@ -13,12 +13,16 @@ type MugedaFormV3 struct {
 
 // Route mugeda
 func (f3 *MugedaFormV3) Route(r *gin.RouterGroup) {
-	r.Any("oauth/wechat", f3.MugedaFormV3User.OauthURL)
-	r.Any("oauth/wechat/callback", f3.MugedaFormV3User.CallBack)
+	r.Any("oauth/wechat", f3.MugedaFormV3User.OauthURL)             // 返回授权地址
+	r.Any("oauth/wechat/callback", f3.MugedaFormV3User.CallBack)    // 微信授权回调
 	r.GET("oauth/wechat/token", f3.MugedaFormV3User.UseCodeToToken) // 使用code 换取登录信息
-	r.GET("oauth/wechat/userinfo", f3.MugedaFormV3User.Get)
-	r.Use(f3.MugedaFormV3User.MiddleWare)
-	r.POST("update/info", f3.MugedaFormV3User.UpdateInfo) // 更新信息
+	r.GET("oauth/wechat/userinfo", f3.MugedaFormV3User.Get)         // 获取用户信息
+	r.Use(f3.MugedaFormV3User.MiddleWare)                           // 用户登陆中间件
+	r.PUT("userinfo", f3.MugedaFormV3User.PUTUserInfo)              // 更新用户信息
+	r.GET("bless", f3b.GET)                                         // 查询祝福语
+	r.PUT("bless", f3b.Create)                                      // 创建祝福语
+	r.GET("bless/receive", f3br.GET)                                // 查询是否满足4人
+	r.POST("bless/receive/invite", f3br.AddInvite)                  // 助力执行此操作
 	/*
 
 		r.POST("", f3.Create)
