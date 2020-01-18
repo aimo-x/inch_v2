@@ -29,13 +29,19 @@ func (fc *MugedaFormV3Bless) GET(c *gin.Context) {
 	rwSus("success", dfc, c)
 }
 
-// Create 创建祝福语 content
+// Create 创建祝福语 content=&camp_id= 并加入阵营
 func (fc *MugedaFormV3Bless) Create(c *gin.Context) {
 	var dfc model.MugedaFormV3Bless
 	dfc.Content = c.Request.FormValue("content")
 	dfc.OpenID = fc.MugedaFormV3User.OpenID
 	err := dfc.Create()
 	if err != nil {
+		rwErr("error", err, c)
+		return
+	}
+	var in model.MugedaFormV3User
+	b, err := in.AddCamp(fc.MugedaFormV3User.OpenID, c.Request.FormValue("camp_id"))
+	if b || err != nil {
 		rwErr("error", err, c)
 		return
 	}

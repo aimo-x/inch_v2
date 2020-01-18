@@ -1,6 +1,8 @@
 package model
 
 import (
+	"strings"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -49,8 +51,8 @@ func (uw *MugedaFormV3User) First(openid interface{}) (b bool, err error) {
 	return
 }
 
-// Updates 检查用户 appid and openid 更新用户信息 {"name":"","phone":"", "address":"}
-func (uw *MugedaFormV3User) Updates(appid, openid interface{}, msi map[string]interface{}) (b bool, err error) {
+// Updates 检查用户 appid and openid 更新用户信息 示例 {"name":"","phone":"", "address":"}
+func (uw *MugedaFormV3User) Updates(openid interface{}, msi map[string]interface{}) (b bool, err error) {
 	db, err := db()
 	defer db.Close()
 	if err != nil {
@@ -64,6 +66,51 @@ func (uw *MugedaFormV3User) Updates(appid, openid interface{}, msi map[string]in
 	if b = rows.RecordNotFound(); b {
 		return
 	}
+	if err = rows.Error; err != nil {
+		return
+	}
+	return
+}
+
+// AddCamp 加入阵营
+func (uw *MugedaFormV3User) AddCamp(openid, campID string) (b bool, err error) {
+	db, err := db()
+	defer db.Close()
+	if err != nil {
+		return
+	}
+	rows := db.Where("open_id = ?", openid).First(&uw)
+	if b = rows.RecordNotFound(); b {
+		return
+	}
+	campIDArr := strings.Split(uw.CampID, ",")
+	for _, v := range campIDArr {
+		if v == campID {
+			return
+		}
+	}
+	if len(uw.CampID) > 0 {
+		campID = uw.CampID + "," + campID
+	}
+	rows = rows.Update("camp_id", campID)
+	if b = rows.RecordNotFound(); b {
+		return
+	}
+	if err = rows.Error; err != nil {
+		return
+	}
+	return
+}
+
+// FindHeadIMG ...
+func (uw *MugedaFormV3User) FindHeadIMG(openid string) (uws []MugedaFormV3User, err error) {
+	db, err := db()
+	defer db.Close()
+	if err != nil {
+		return
+	}
+	openids := strings.Split(openid, ",")
+	rows := db.Where("open_id IN (?)", openids).Find(&uws)
 	if err = rows.Error; err != nil {
 		return
 	}

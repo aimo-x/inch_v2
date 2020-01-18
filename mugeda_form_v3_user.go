@@ -11,6 +11,7 @@ import (
 	"inchv2/wechat/cache"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -116,7 +117,13 @@ func (uw *MugedaFormV3User) CallBack(c *gin.Context) {
 		c.Writer.Write([]byte("<title>授权登陆失败</title><h1>" + fmt.Sprint(err) + "</h1>"))
 		return
 	}
-	c.Redirect(302, c.Request.FormValue("state")+"?oauth=wechat&&code="+code)
+	state := c.Request.FormValue("state")
+	if strings.Index(state, "?") == -1 {
+		c.Redirect(302, state+"?oauth=wechat&&code="+code)
+	} else {
+		c.Redirect(302, state+"&oauth=wechat&&code="+code)
+	}
+
 }
 
 // PUTUserInfo name + phone + address
@@ -129,7 +136,7 @@ func (uw *MugedaFormV3User) PUTUserInfo(c *gin.Context) {
 	in.Phone = c.Request.FormValue("phone")
 	in.Address = c.Request.FormValue("address")
 	msi := map[string]interface{}{"name": in.Name, "phone": in.Phone, "address": in.Address}
-	b, err := in.Updates(in.AppID, in.OpenID, msi)
+	b, err := in.Updates(in.OpenID, msi)
 	if b || err != nil {
 		rwErr("系统错误", err, c)
 		return
@@ -213,4 +220,16 @@ func (uw *MugedaFormV3User) GetWeChat() (wx *wechat.Wechat) {
 	cfg.Cache = Redis
 	wx = wechat.NewWechat(&cfg)
 	return wx
+}
+
+// GetWeChatHeadIMG 获取头像集合 open_id_arr ,分隔符
+func (uw *MugedaFormV3User) GetWeChatHeadIMG(c *gin.Context) {
+	var u model.MugedaFormV3User
+	openidArr := c.Request.FormValue("open_id_arr")
+	us, err := u.FindHeadIMG(openidArr)
+	if err != nil {
+		rwErr("error", err, c)
+		return
+	}
+	rwSus("success", us, c)
 }

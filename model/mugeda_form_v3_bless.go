@@ -11,7 +11,7 @@ type MugedaFormV3Bless struct {
 	OpenID  string `json:"open_id"` // 创建祝福者
 }
 
-// Create 发起祝福
+// Create 发起祝福 并加入阵营
 func (fb *MugedaFormV3Bless) Create() error {
 	db, err := db()
 	defer db.Close()

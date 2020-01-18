@@ -26,6 +26,7 @@ func (fc *MugedaFormV3BlessReceive) GET(c *gin.Context) {
 	}
 	b, err := dfc.First(fc.MugedaFormV3User.OpenID, uint(blessIDInt))
 	if b {
+		// 不可以接收自己的祝福语 后期考虑
 		dfc.Invite = ""
 		dfc.BlessID = uint(blessIDInt)
 		dfc.OpenID = fc.MugedaFormV3User.OpenID
@@ -53,7 +54,6 @@ func (fc *MugedaFormV3BlessReceive) GET(c *gin.Context) {
 		}
 		data = gin.H{"mugeda_form_v3_bless_receive": dfc, "mugeda_form_v3_bless": f3b}
 	}
-
 	rwSus("success", data, c)
 }
 

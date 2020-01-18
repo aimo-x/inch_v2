@@ -19,8 +19,9 @@ func (f3 *MugedaFormV3) Route(r *gin.RouterGroup) {
 	r.GET("oauth/wechat/userinfo", f3.MugedaFormV3User.Get)         // 获取用户信息
 	r.Use(f3.MugedaFormV3User.MiddleWare)                           // 用户登陆中间件
 	r.PUT("userinfo", f3.MugedaFormV3User.PUTUserInfo)              // 更新用户信息
-	r.GET("bless", f3b.GET)                                         // 查询祝福语
-	r.PUT("bless", f3b.Create)                                      // 创建祝福语
+	r.GET("userinfo/arr", f3u.GetWeChatHeadIMG)                     // 获取信息集合 GetWeChatHeadIMG
+	r.GET("bless", f3b.GET)                                         // 查询祝福语 暂时不使用
+	r.POST("bless", f3b.Create)                                     // 创建祝福语
 	r.GET("bless/receive", f3br.GET)                                // 查询是否满足4人
 	r.POST("bless/receive/invite", f3br.AddInvite)                  // 助力执行此操作
 	/*
