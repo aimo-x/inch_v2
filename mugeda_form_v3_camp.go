@@ -21,3 +21,14 @@ func (fc *MugedaFormV3Camp) GET(c *gin.Context) {
 	}
 	rwSus("success", dfc, c)
 }
+
+// Find 查询所有福气值
+func (fc *MugedaFormV3Camp) Find(c *gin.Context) {
+	var dfc model.MugedaFormV3Camp
+	dfcs, err := dfc.Find()
+	if err != nil {
+		rwErr("error", err, c)
+		return
+	}
+	rwSus("success", dfcs, c)
+}

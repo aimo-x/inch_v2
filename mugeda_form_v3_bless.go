@@ -45,5 +45,12 @@ func (fc *MugedaFormV3Bless) Create(c *gin.Context) {
 		rwErr("error", err, c)
 		return
 	}
+	// 增加阵营得分
+	var camp model.MugedaFormV3Camp
+	b, err = camp.Updates(c.Request.FormValue("camp_id"))
+	if err != nil || b {
+		rwErr("error", err, c)
+		return
+	}
 	rwSus("success", dfc, c)
 }

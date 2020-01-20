@@ -27,7 +27,7 @@ func (fc *MugedaFormV3BlessReceive) GET(c *gin.Context) {
 	b, err := dfc.First(fc.MugedaFormV3User.OpenID, uint(blessIDInt))
 	if b {
 		// 不可以接收自己的祝福语 后期考虑
-		dfc.Invite = ""
+		//dfc.Invite = ""
 		dfc.BlessID = uint(blessIDInt)
 		dfc.OpenID = fc.MugedaFormV3User.OpenID
 		err = dfc.Create()

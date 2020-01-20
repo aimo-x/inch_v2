@@ -24,6 +24,7 @@ func (f3 *MugedaFormV3) Route(r *gin.RouterGroup) {
 	r.POST("bless", f3b.Create)                                     // 创建祝福语
 	r.GET("bless/receive", f3br.GET)                                // 查询是否满足4人
 	r.POST("bless/receive/invite", f3br.AddInvite)                  // 助力执行此操作
+	r.POST("camp", f3c.Find)                                        // 获取阵营得分列表
 	/*
 
 		r.POST("", f3.Create)

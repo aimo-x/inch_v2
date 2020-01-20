@@ -71,9 +71,9 @@ func (fbr *MugedaFormV3BlessReceive) AddInvite(blessReceiveIDInt uint, invite st
 		return
 	}
 	if len(fbr.Invite) > 0 {
-		fbr.Invite = fbr.Invite + "," + invite
+		invite = fbr.Invite + "," + invite
 	}
-	rows = rows.Update("invite", fbr.Invite)
+	rows = rows.Update("invite", invite)
 	if b = rows.RecordNotFound(); b {
 		return
 	}

@@ -73,3 +73,19 @@ func (uw *MugedaFormV3Camp) Updates(id string) (b bool, err error) {
 	}
 	return
 }
+
+// Find 查询阵营
+func (uw *MugedaFormV3Camp) Find() (uws []MugedaFormV3Camp, err error) {
+	db, err := db()
+	defer db.Close()
+	if err != nil {
+		return
+	}
+
+	rows := db.Find(&uws)
+
+	if err = rows.Error; err != nil {
+		return
+	}
+	return
+}

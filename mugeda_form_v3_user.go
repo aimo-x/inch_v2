@@ -215,8 +215,8 @@ func (uw *MugedaFormV3User) GetWeChat() (wx *wechat.Wechat) {
 	opts.Database = 1
 	Redis := cache.NewRedis(&opts)
 	var cfg wechat.Config
-	cfg.AppID = "wxa67a64f664dfba26"                   // conf.GetConf().WeChat.AppID         // "wxa67a64f664dfba26"
-	cfg.AppSecret = "2ddcf1edc8a54ca2de8b2ebd8f15fcca" // conf.GetConf().WeChat.AppSecret //  "2ddcf1edc8a54ca2de8b2ebd8f15fcca"
+	cfg.AppID = "wxbdb9cd64895da3d3"                   // "wxa67a64f664dfba26"                   // conf.GetConf().WeChat.AppID         // "wxa67a64f664dfba26"
+	cfg.AppSecret = "25295943ffeaa1e9e8b7de4c8588eaf0" // "2ddcf1edc8a54ca2de8b2ebd8f15fcca" // conf.GetConf().WeChat.AppSecret //  "2ddcf1edc8a54ca2de8b2ebd8f15fcca"
 	cfg.Cache = Redis
 	wx = wechat.NewWechat(&cfg)
 	return wx
