@@ -132,7 +132,7 @@ init_oauth = () => {
       .then((res)=>{ console.log(res.data)
           if(res.code == 1){
             var token = res.data
-            setCookie("wechat_jwt_token_fv3",token,1/2000);
+            setCookie("wechat_jwt_token_fv3",token,1/48);
             wechat_jwt_token = token; // 赋值登录信息 
           }else{
             wechat_oauth();
@@ -212,11 +212,12 @@ post_bless_receive_invite = () => {
 }
 // 木疙瘩 api
 mugeda.addEventListener("renderready", function(){
+  
   var vConsole = new VConsole();
       console.log('Hello world');
   scene = mugeda.scene
   // 加载CSS
-  dynamicLoadCss('https://cdn.jsdelivr.net/npm/@sweetalert2/theme-borderless/borderless.css')
+  // dynamicLoadCss('https://cdn.jsdelivr.net/npm/@sweetalert2/theme-borderless/borderless.css')
   // 
   /*
   Swal.fire(
@@ -228,6 +229,8 @@ mugeda.addEventListener("renderready", function(){
   // 检查是否登陆，是否需要助力
   if(bless_receive_id && wechat_jwt_token){
     // 执行助力接口 
+    // 邀请显示
+    scene.getObjectByName("邀请显示").top = 10000
     post_bless_receive_invite()
     scene.gotoAndPause(0, 1);
   }
@@ -235,13 +238,13 @@ mugeda.addEventListener("renderready", function(){
   if(bless_id && wechat_jwt_token){
     // 跳转到邀请页面
     Swal.fire({
-      icon: 'error',
+      // icon: 'error',
       text: "您收到一个祝福",
       confirmButtonText: "好的"
     })
     get_bless_receive()
   }
-
+  post_camp_list()
 });
 
 
@@ -295,6 +298,7 @@ get_bless_receive_headimg = (invite) => {
 // 查看祝福 执行此函数 
 view_mugeda_form_v3_bless = () => {
   if(mugeda_form_v3_bless == ""){
+    // scene.getObjectByName("分享提示").top = 0
     Swal.fire({
       // icon: 'error',
       text: "暂时无法查看祝福",
@@ -316,11 +320,14 @@ fq_invite = () => {
         return h5_link+"?bless_receive_id="+bless_receive_id
     }
   });
+  scene.getObjectByName("分享提示").top = 0
+  /*
   Swal.fire({
     icon: 'success',
     text: "点击右上角分享给好友助力",
     confirmButtonText: "好的"
   })
+  */
 }
 // 接收/查询祝福语 不存在则自动创建/满足条件即可查看/祝福语
 get_bless_receive = () => {
@@ -384,14 +391,23 @@ get_bless_receive = () => {
 }
 
 // 生成带参数海报二维码
+var if_get_qrcode = true
 get_qrcode = (content) => {
+  if(!if_get_qrcode){
+    return
+  }
+  if_get_qrcode = false
   fetch("https://iuu.pub/api/qr?url="+content)
     .then((res)=>res.json())
     .then((res)=>{ 
+      if_get_qrcode = true
       console.log("生成带参数海报二维码",res.data)
         if(res.code == 1){
           var qr = scene.getObjectByName("二维码");
           qr.src = "data:image/png;base64,"+res.data
+          setTimeout(function(){
+            scene.gotoAndPause(0, 4)
+          },250)
           // scene.gotoPage(5, options);
         }else{
           // Mugine.Utils.Toast.info(res.msg+",error:"+res.err, {type:'info'});
@@ -404,6 +420,7 @@ get_qrcode = (content) => {
         }
     })
     .catch((err)=>{
+      if_get_qrcode = true
       console.log(err)
         Swal.fire({
           icon: 'error',
@@ -413,9 +430,23 @@ get_qrcode = (content) => {
     })
 }
 // 创建祝福语 并加入阵营
+var if_post_bless_content = true
 post_bless_content = () => {
   var camp_id = scene.getObjectByName("阵营ID").text
   var content = scene.getObjectByName("祝福").text
+  if(!if_post_bless_content){
+    // 阻止多次提交
+    return
+  }
+  if(content.length < 1){
+    Swal.fire({
+      icon: 'error',
+      text: "未填写祝福",
+      confirmButtonText: "好的"
+    })
+    return
+  }
+  if_post_bless_content = false
   fetch(domain+"/v3/mugeda/form/v3/bless?content="+content+"&camp_id="+camp_id,{
     headers: {
       'wechat_jwt_token': wechat_jwt_token,
@@ -427,18 +458,21 @@ post_bless_content = () => {
   })
   .then((res)=>res.json())
   .then((res)=>{ 
+    if_post_bless_content = true
     console.log("post_bless_content",res.data)
     if(res.code == 1){
       // scene.gotoAndPause(1, 5);
+      var n = parseInt(camp_id)-1 
+      scene.gotoAndPause(n, 5);
       // 生成带参数海报二维码
       get_qrcode(h5_link+"?bless_id="+res.data.ID)
-      scene.gotoAndPause(0, 4);
+      /*
       Swal.fire({
         icon: 'success',
         title: res.msg,
         confirmButtonText: "好的"
       })
-      console.log(res.data);
+      */
     }else{
       Swal.fire({
         icon: 'error',
@@ -450,6 +484,7 @@ post_bless_content = () => {
     }
   })
   .catch((err)=>{
+    if_post_bless_content = true
     console.log(err)
     Swal.fire({
       icon: 'error',
@@ -460,7 +495,13 @@ post_bless_content = () => {
 }
 
 // 提交用户信息
+var if_put_user_info = true
 put_user_info = () => {
+  if(!if_put_user_info){
+    // 阻止多次提交
+    return
+  }
+  
   var name = scene.getObjectByName("姓名").text
   if(name.length < 1 ){
     // Mugine.Utils.Toast.info("未输入姓名", {type:'info'});
@@ -490,6 +531,7 @@ put_user_info = () => {
     })
     return
   }
+  if_put_user_info = false
   // 提交个人信息 
   fetch(domain+"/v3/mugeda/form/v3/userinfo?name="+name+"&phone="+phone+"&address="+address,{
     headers: {
@@ -502,10 +544,11 @@ put_user_info = () => {
   })
   .then((res)=>res.json())
   .then((res)=>{ 
+    if_put_user_info = true
     console.log("提交个人信息",res.data)
     if(res.code == 1){
       // scene.gotoAndPause(1, 5);
-
+      scene.gotoAndPause(6, 5);
       Swal.fire({
         icon: 'success',
         title: "提交成功",
@@ -523,6 +566,7 @@ put_user_info = () => {
     }
   })
   .catch((err)=>{
+    if_put_user_info = true
     console.log(err)
     Swal.fire({
       icon: 'error',
@@ -534,8 +578,7 @@ put_user_info = () => {
 
 // 获取阵营列表
 post_camp_list = () => {
-  var camp_id = scene.getObjectByName("阵营ID").text
-  var content = scene.getObjectByName("祝福").text
+
   fetch(domain+"/v3/mugeda/form/v3/camp",{
     headers: {
       'wechat_jwt_token': wechat_jwt_token,
@@ -551,8 +594,11 @@ post_camp_list = () => {
     if(res.code == 1){
       var t_score = 0
       for(var i = 0; i<6;i++){
-        // 豆#1 【进度条】 福气值#1
+        // 先计算总分
         t_score = t_score+res.data[i].score
+      }
+      for(var i = 0; i<6;i++){
+        // 豆#1 【进度条】 福气值#1
         var n = i+1
         scene.getObjectByName("豆#"+n).width = 150*(res.data[i].score/t_score)
         scene.getObjectByName("福气值#"+n).text = res.data[i].score

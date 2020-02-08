@@ -9,6 +9,8 @@ type MugedaFormV3Bless struct {
 	gorm.Model
 	Content string `json:"content"` // 祝福内容
 	OpenID  string `json:"open_id"` // 创建祝福者
+	CampID  uint   `json:"camp_id"` // 阵营
+
 }
 
 // Create 发起祝福 并加入阵营

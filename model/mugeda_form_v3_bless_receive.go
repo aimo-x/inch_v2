@@ -10,6 +10,7 @@ import (
 type MugedaFormV3BlessReceive struct {
 	gorm.Model
 	BlessID uint   `json:"bless_id"` // 祝福ID
+	CampID  uint   `json:"camp_id"`  // 阵营
 	OpenID  string `json:"open_id"`  // 接收者
 	Invite  string `json:"invite"`   // 被邀请者 (逗号分隔符 限制 4个)
 }

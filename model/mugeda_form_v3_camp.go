@@ -11,6 +11,7 @@ type MugedaFormV3Camp struct {
 	gorm.Model
 	Name  string `json:"name"`  // 阵营名字
 	Score int    `json:"score"` // 得分
+
 }
 
 // Create 创建阵营
@@ -49,17 +50,13 @@ func (uw *MugedaFormV3Camp) First(id string) (b bool, err error) {
 }
 
 // Updates 更新阵营得分 +1
-func (uw *MugedaFormV3Camp) Updates(id string) (b bool, err error) {
+func (uw *MugedaFormV3Camp) Updates(id uint) (b bool, err error) {
 	db, err := db()
 	defer db.Close()
 	if err != nil {
 		return
 	}
-	ID, err := strconv.Atoi(id)
-	if err != nil {
-		return
-	}
-	rows := db.Where("id = ?", ID).First(&uw)
+	rows := db.Where("id = ?", id).First(&uw)
 	if b = rows.RecordNotFound(); b {
 		return
 	}

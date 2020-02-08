@@ -17,6 +17,8 @@ type MugedaFormV3BlessReceive struct {
 // 第一次接收祝福，使用 bless_id 和 openid 进行查询 是否存在 存在即返回，不存在即创建
 // 查询结果，如果满足4个邀请人，即返回祝福语
 func (fc *MugedaFormV3BlessReceive) GET(c *gin.Context) {
+
+	var data gin.H
 	var dfc model.MugedaFormV3BlessReceive
 	blessID := c.Request.FormValue("bless_id")
 	blessIDInt, err := strconv.Atoi(blessID)
@@ -24,10 +26,28 @@ func (fc *MugedaFormV3BlessReceive) GET(c *gin.Context) {
 		rwErr("error", err, c)
 		return
 	}
-	b, err := dfc.First(fc.MugedaFormV3User.OpenID, uint(blessIDInt))
+	// 查询祝福
+	var f3b model.MugedaFormV3Bless
+	b, err := f3b.First(uint(blessIDInt))
+	if err != nil || b {
+		rwErr("error", err, c)
+		return
+	}
+	// 加入阵营
+	var in model.MugedaFormV3User
+	b, err = in.AddCamp(fc.MugedaFormV3User.OpenID, strconv.Itoa(int(f3b.CampID)))
+	if b || err != nil {
+		rwErr("error", err, c)
+		return
+	}
+	// 查找
+	b, err = dfc.First(fc.MugedaFormV3User.OpenID, uint(blessIDInt))
+	// 数据
+
 	if b {
 		// 不可以接收自己的祝福语 后期考虑
 		//dfc.Invite = ""
+		dfc.CampID = f3b.CampID
 		dfc.BlessID = uint(blessIDInt)
 		dfc.OpenID = fc.MugedaFormV3User.OpenID
 		err = dfc.Create()
@@ -35,7 +55,8 @@ func (fc *MugedaFormV3BlessReceive) GET(c *gin.Context) {
 			rwErr("error", err, c)
 			return
 		}
-		rwSus("success", dfc, c)
+		data = gin.H{"mugeda_form_v3_bless_receive": dfc, "mugeda_form_v3_bless": ""}
+		rwSus("success", data, c)
 		return
 	}
 	if err != nil {
@@ -43,15 +64,9 @@ func (fc *MugedaFormV3BlessReceive) GET(c *gin.Context) {
 		return
 	}
 	ins := strings.Split(dfc.Invite, ",")
-	var data gin.H
+
 	data = gin.H{"mugeda_form_v3_bless_receive": dfc, "mugeda_form_v3_bless": ""}
 	if len(ins) > 3 {
-		var f3b model.MugedaFormV3Bless
-		b, err = f3b.First(dfc.BlessID)
-		if err != nil || b {
-			rwErr("error", err, c)
-			return
-		}
 		data = gin.H{"mugeda_form_v3_bless_receive": dfc, "mugeda_form_v3_bless": f3b}
 	}
 	rwSus("success", data, c)
@@ -70,6 +85,19 @@ func (fc *MugedaFormV3BlessReceive) AddInvite(c *gin.Context) {
 	if b || err != nil {
 		rwErr("error", err, c)
 	}
+	var in model.MugedaFormV3User
+	b, err = in.AddCamp(fc.MugedaFormV3User.OpenID, strconv.Itoa(int(dfc.CampID)))
+	if b || err != nil {
+		rwErr("error", err, c)
+		return
+	}
+	// 为阵营加分
+	var dfca model.MugedaFormV3Camp
+	b, err = dfca.Updates(dfc.CampID)
+	if err != nil || b {
+		rwErr("error", err, c)
+		return
+	}
 	rwSus("success", dfc, c)
 }
 
@@ -83,6 +111,12 @@ func (fc *MugedaFormV3BlessReceive) Create(c *gin.Context) {
 		rwErr("error", err, c)
 		return
 	}
+	var dfb model.MugedaFormV3Bless
+	b, err := dfb.First(uint(blessIDInt))
+	if b || err != nil {
+		rwErr("error", err, c)
+	}
+	dfc.CampID = dfb.CampID
 	dfc.Invite = ""
 	dfc.BlessID = uint(blessIDInt)
 	dfc.OpenID = fc.MugedaFormV3User.OpenID

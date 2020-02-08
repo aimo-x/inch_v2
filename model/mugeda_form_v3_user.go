@@ -73,7 +73,7 @@ func (uw *MugedaFormV3User) Updates(openid interface{}, msi map[string]interface
 }
 
 // AddCamp 加入阵营
-func (uw *MugedaFormV3User) AddCamp(openid, campID string) (b bool, err error) {
+func (uw *MugedaFormV3User) AddCamp(openid string, campID string) (b bool, err error) {
 	db, err := db()
 	defer db.Close()
 	if err != nil {
